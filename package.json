@@ -1,0 +1,13 @@
+{
+  "name": "screen-pop-demo",
+  "version": "1.0.0",
+  "description": "Screen Pop with GoTo-Connect",
+  "scripts": {
+    "start": "http-server -p 5000"
+  },
+  "author": "LogMeIn",
+  "license": "MIT",
+  "dependencies": {
+    "http-server": "^14.0.0"
+  }
+}

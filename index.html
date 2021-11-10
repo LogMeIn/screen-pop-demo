@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Screen Pop Demo</title>
+  <style>
+    .card {
+      border-style: solid;
+      border-color: #494F57;
+    }
+  </style>
+</head>
+
+
+<body>
+  <div id="app">
+    <h3>Events</h3>
+    <div v-if="!ready">Calling APIs ..</div>
+    <div v-if="!events.length && ready">Waiting for Call Event ..</div>
+    <div v-for="event of events">
+      <div class="card">
+        <div class="card-header">
+          <h3>{{ event.name }}, Last call: {{event.lastCall}}</h5>
+        </div>
+        <div class="card-body">
+          <p>Phone: {{ event.number }}</p>
+          <p>Notes: {{ event.notes }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="demo_lib.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+  <script>
+    new Vue({
+      el: "#app",
+      data() {
+        return {
+          ready: false,
+          token: "",
+          lines: "",
+          session: "",
+          subscription: "",
+          events: [],
+          oauth: new OAuth({
+            // Add Client Info
+            clientId: "2dffecf8-70c2-4a08-8139-9fe5624917be",
+          })
+        }
+      },
+      mounted: function () {
+        this.start() //method will execute at pageload
+      },
+      methods: {
+        start: function () {
+          this.oauth.getToken().then(token => {
+            this.token = token
+            this.callApis()
+          })
+        },
+        callApis: async function () {
+          this.lines = await this.getLineInfo()
+          this.session = await this.createSession()
+          this.subscription = await this.subscribe()
+          await this.listen()
+          this.ready = true;
+        },
+        lookup: function (number) {
+          return {
+            name: "John Doe",
+            lastCall: "1 Hour ago",
+            number: number,
+            notes: "VIP, loyal customer"
+          }
+        },
+
+        getLineInfo: async function () {
+          // Get Line Info -> https://developer.goto.com/GoToConnect/#tag/Lines/paths/~1users~1v1~1lines/get
+          const response = await fetch("https://api.jive.com/users/v1/lines", {
+            headers: { "Authorization": `Bearer ${this.token}` }
+          })
+
+          return response.json();
+        },
+
+        createSession: async function () {
+          // Create Realtime Session -> https://developer.goto.com/GoToConnect/#section/Getting-Started/Step-One:-Creating-a-Session
+          const response = await fetch("https://realtime.jive.com/v2/session", {
+            headers: { "Authorization": `Bearer ${this.token}` },
+            method: "POST"
+          })
+          return response.json();
+        },
+
+        subscribe: async function () {
+          // Create Subscription -> https://developer.goto.com/GoToConnect/#section/Getting-Started/Step-Three:-Subscribe
+          const firstLine = this.lines.items[0];
+          const account = firstLine.organization.id;
+
+          const data = JSON.stringify([{
+            "id": "mylinesubscription",
+            "type": "dialog",
+            "entity": {
+              "account": account,
+              "type": "line.v2",
+              "id": firstLine.id
+            }
+          }])
+
+          const response = await fetch(this.session.subscriptions, {
+            headers: {
+              "Authorization": `Bearer ${this.token}`,
+              "Content-Type": "application/json"
+            },
+            method: "POST",
+            body: data
+          })
+          return response.json();
+        },
+
+        listen: async function () {
+          // Listen for events
+          this.socket = new WebSocket(this.session.ws)
+
+          this.socket.onmessage = (event) => {
+            const data = JSON.parse(event.data)
+            console.log(data)
+            if (data.type == "announce") {
+              const meta = this.lookup(data.data.caller.number)
+              this.events.unshift(meta)
+            }
+            else {
+              console.log("No handler")
+            }
+          }
+        }
+      }
+    })
+  </script>
+</body>
+
+</html>

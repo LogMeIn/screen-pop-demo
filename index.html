@@ -45,7 +45,7 @@
           events: [],
           oauth: new OAuth({
             // Add Client Info
-            clientId: "2dffecf8-70c2-4a08-8139-9fe5624917be",
+            clientId: "<YOUR_CLIENT_HERE>",
           })
         }
       },
@@ -77,63 +77,30 @@
 
         getLineInfo: async function () {
           // Get Line Info -> https://developer.goto.com/GoToConnect/#tag/Lines/paths/~1users~1v1~1lines/get
-          const response = await fetch("https://api.jive.com/users/v1/lines", {
-            headers: { "Authorization": `Bearer ${this.token}` }
-          })
-
-          return response.json();
+          /*
+            Fill in this function
+          */
         },
 
         createSession: async function () {
           // Create Realtime Session -> https://developer.goto.com/GoToConnect/#section/Getting-Started/Step-One:-Creating-a-Session
-          const response = await fetch("https://realtime.jive.com/v2/session", {
-            headers: { "Authorization": `Bearer ${this.token}` },
-            method: "POST"
-          })
-          return response.json();
+          /*
+            Fill in this function
+          */
         },
 
         subscribe: async function () {
           // Create Subscription -> https://developer.goto.com/GoToConnect/#section/Getting-Started/Step-Three:-Subscribe
-          const firstLine = this.lines.items[0];
-          const account = firstLine.organization.id;
-
-          const data = JSON.stringify([{
-            "id": "mylinesubscription",
-            "type": "dialog",
-            "entity": {
-              "account": account,
-              "type": "line.v2",
-              "id": firstLine.id
-            }
-          }])
-
-          const response = await fetch(this.session.subscriptions, {
-            headers: {
-              "Authorization": `Bearer ${this.token}`,
-              "Content-Type": "application/json"
-            },
-            method: "POST",
-            body: data
-          })
-          return response.json();
+          /*
+            Fill in this function
+          */
         },
 
         listen: async function () {
           // Listen for events
-          this.socket = new WebSocket(this.session.ws)
-
-          this.socket.onmessage = (event) => {
-            const data = JSON.parse(event.data)
-            console.log(data)
-            if (data.type == "announce") {
-              const meta = this.lookup(data.data.caller.number)
-              this.events.unshift(meta)
-            }
-            else {
-              console.log("No handler")
-            }
-          }
+          /*
+            Fill in this function
+          */
         }
       }
     })

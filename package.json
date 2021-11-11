@@ -1,7 +1,7 @@
 {
   "name": "screen-pop-demo",
   "version": "1.0.0",
-  "description": "Screen Pop with GoTo-Connect",
+  "description": "Screen Pop with GoTo Connect",
   "scripts": {
     "start": "http-server -p 5000"
   },

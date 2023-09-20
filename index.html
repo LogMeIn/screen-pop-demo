@@ -39,13 +39,12 @@
         return {
           ready: false,
           token: "",
-          lines: "",
-          session: "",
           subscription: "",
+          channel: "",
           events: [],
           oauth: new OAuth({
             // Add Client Info
-            clientId: "2dffecf8-70c2-4a08-8139-9fe5624917be",
+            clientId: "2dffecf8-70c2-4a08-8139-9fe5624917be"
           })
         }
       },
@@ -60,55 +59,52 @@
           })
         },
         callApis: async function () {
-          this.lines = await this.getLineInfo()
-          this.session = await this.createSession()
+          this.channel = await this.createChannel()
           this.subscription = await this.subscribe()
           await this.listen()
           this.ready = true;
         },
-        lookup: function (number) {
+        lookup: function (name) {
           return {
-            name: "John Doe",
+            name: name,
             lastCall: "1 Hour ago",
-            number: number,
+            number: "+18001111111",
             notes: "VIP, loyal customer"
           }
         },
 
-        getLineInfo: async function () {
-          // Get Line Info -> https://developer.goto.com/GoToConnect/#tag/Lines/paths/~1users~1v1~1lines/get
-          const response = await fetch("https://api.goto.com/users/v1/lines", {
-            headers: { "Authorization": `Bearer ${this.token}` }
+        createChannel: async function () {
+          const data = JSON.stringify({
+            channelType: "WebSockets",
+            channelData: {
+              channelType: "WebSockets",
+              isConnected: false,
+            }
           })
-
-          return response.json();
-        },
-
-        createSession: async function () {
-          // Create Realtime Session -> https://developer.goto.com/GoToConnect/#section/Getting-Started/Step-One:-Creating-a-Session
-          const response = await fetch("https://realtime.jive.com/v2/session", {
-            headers: { "Authorization": `Bearer ${this.token}` },
-            method: "POST"
+          const response = await fetch("https://api.goto.com/notification-channel/v1/channels/screen-pop-demo", {
+            headers: {
+              "Authorization": `Bearer ${this.token}`,
+              "Content-Type": "application/json"
+            },
+            method: "POST",
+            body: data
           })
           return response.json();
         },
 
         subscribe: async function () {
-          // Create Subscription -> https://developer.goto.com/GoToConnect/#section/Getting-Started/Step-Three:-Subscribe
-          const firstLine = this.lines.items[0];
-          const account = firstLine.organization.id;
+          // Create Subscription -> https://developer.goto.com/GoToConnect/#operation/createCallEventsSubscriptions
 
-          const data = JSON.stringify([{
-            "id": "mylinesubscription",
-            "type": "dialog",
-            "entity": {
-              "account": account,
-              "type": "line.v2",
-              "id": firstLine.id
-            }
-          }])
+          const data = JSON.stringify({
+            "channelId": this.channel.channelId,
+            "accountKeys": [
+              { "id": "4395980921202798602" }
+            ]
+          })
 
-          const response = await fetch(this.session.subscriptions, {
+          // test request : curl -X POST 'https://api.goto.com/call-events/v1/subscriptions' -H 'Authorization: Bearer {ACCESS_TOKEN}' -H 'Content-Type: application/json' \ -d '{"channelId": "a9d70239-a8c4-4b13-8ccf-9c60fb3ad388", "accountKeys": [{"id": "4395980921202798602"}]}'
+
+          const response = await fetch("https://api.goto.com/call-events/v1/subscriptions", {
             headers: {
               "Authorization": `Bearer ${this.token}`,
               "Content-Type": "application/json"
@@ -121,13 +117,12 @@
 
         listen: async function () {
           // Listen for events
-          this.socket = new WebSocket(this.session.ws)
-
+          this.socket = new WebSocket(this.channel.channelData.channelURL)
           this.socket.onmessage = (event) => {
             const data = JSON.parse(event.data)
-            console.log(data)
-            if (data.type == "announce") {
-              const meta = this.lookup(data.data.caller.number)
+            const caller = data.data.content.state.participants[0]
+            if (caller.status.value == "RINGING") {
+              const meta = this.lookup(caller.type.name)
               this.events.unshift(meta)
             }
             else {

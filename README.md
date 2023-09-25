@@ -6,6 +6,5 @@
 
 # start Backend
 
-1) `$npm i`
-2) `$npm build`
+1) `$cd backend`
 3) `$npm start`

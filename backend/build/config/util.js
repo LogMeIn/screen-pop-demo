@@ -6,7 +6,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Util = void 0;
 const dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config();
-// export default config;
 class Util {
     static get hostname() {
         return process.env.HOSTNAME || "localhost";

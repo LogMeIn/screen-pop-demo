@@ -8,7 +8,7 @@ const request_1 = __importDefault(require("./request"));
 class SubscriptionRequest {
     constructor(channelId) {
         this.data = {
-            accountKeys: [{ id: "4395980921202798602" }], // put your account keys here
+            accountKeys: [{ id: "4395980921202798602" }], // Put your account keys here
         };
         this.channelId = channelId;
     }

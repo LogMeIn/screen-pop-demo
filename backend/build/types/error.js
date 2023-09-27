@@ -6,8 +6,6 @@ class HttpError extends Error {
         super(message);
         this.status = status;
         this.code = code;
-        console.log(`Error code created with message:${message} with code ${typeof this
-            .code} and status ${this.status}`);
     }
 }
 exports.HttpError = HttpError;

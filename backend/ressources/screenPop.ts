@@ -1,17 +1,13 @@
 import { NextFunction, Request, Response } from "express";
-import { BadRequest, Unauthorized } from "http-errors";
 
 import { Logger } from "../config/logger";
 import SubscriptionApi from "../service/subscription";
 import { ChannelResponse } from "../types/channel";
-import { Code, HttpError, Status } from "../types/error";
+import { HttpError } from "../types/error";
 
 import { GoToApiService } from "../types/externalApi";
 import { ScreenPopResponse } from "../types/screenPop";
-import {
-  SubscriptionRequest,
-  SubscriptionResponse,
-} from "../types/subscription";
+import { SubscriptionRequest } from "../types/subscription";
 
 export default class ScreenPopRessources {
   private notificationApi: GoToApiService;
@@ -33,7 +29,7 @@ export default class ScreenPopRessources {
     return new SubscriptionApi(subscriptionRequest);
   }
 
-  public ringingPopup = async (
+  public createWsUrl = async (
     req: Request,
     res: Response,
     next: NextFunction,

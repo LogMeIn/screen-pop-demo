@@ -17,7 +17,7 @@ class Util {
         return {
             origin: "http://127.0.0.1:5000",
             methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-            allowedHeaders: "Content-Type,Authorization", // Allow these headers
+            allowedHeaders: "Content-Type,Authorization",
         };
     }
     static setupLogger(logger, req, res, next) {

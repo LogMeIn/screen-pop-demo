@@ -14,14 +14,12 @@ export default class NotificationChannelApi implements GoToApiService {
 
   public async fetchData(token: string) {
     const response = await fetch(
-      `https://api.dev.goto.com/notification-channel/v1/channels/${this.channelNickname}`,
+      `https://api.goto.com/notification-channel/v1/channels/${this.channelNickname}`,
       this.channel.request(token),
     );
     if (response.status != 201) {
       if (response.status == 401) {
-        this.logger.error(
-          `Insufficient scope for notification channel`,
-        );
+        this.logger.error(`Insufficient scope for notification channel`);
         return new HttpError(
           Status.UNAUTHORIZED,
           Code.UNAUTHORIZED,

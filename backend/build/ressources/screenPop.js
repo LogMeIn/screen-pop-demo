@@ -19,7 +19,7 @@ const subscription_2 = require("../types/subscription");
 class ScreenPopRessources {
     constructor(notificationApi) {
         this.logger = new logger_1.Logger("screen-pop-ressources");
-        this.ringingPopup = (req, res, next) => __awaiter(this, void 0, void 0, function* () {
+        this.createWsUrl = (req, res, next) => __awaiter(this, void 0, void 0, function* () {
             const token = this.token(req);
             return Promise.resolve(yield this.notificationApi.fetchData(token))
                 .then((channel) => __awaiter(this, void 0, void 0, function* () {

@@ -10,6 +10,6 @@ export default class ScreenPopEndpoint {
     this.init();
   }
   private init = () => {
-    this.app.post("/screen-pop", this.screenPop.ringingPopup);
+    this.app.post("/screen-pop", this.screenPop.createWsUrl);
   };
 }

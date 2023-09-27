@@ -19,10 +19,10 @@ class NotificationChannelApi {
     }
     fetchData(token) {
         return __awaiter(this, void 0, void 0, function* () {
-            const response = yield fetch(`https://api.dev.goto.com/notification-channel/v1/channels/${this.channelNickname}`, this.channel.request(token));
+            const response = yield fetch(`https://api.goto.com/notification-channel/v1/channels/${this.channelNickname}`, this.channel.request(token));
             if (response.status != 201) {
                 if (response.status == 401) {
-                    this.logger.error(`Insufficient scope for notification channel with token ${token}`);
+                    this.logger.error(`Insufficient scope for notification channel`);
                     return new error_1.HttpError(error_1.Status.UNAUTHORIZED, error_1.Code.UNAUTHORIZED, `missing scopes in the token`);
                 }
                 if (response.status == 403) {

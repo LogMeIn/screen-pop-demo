@@ -1,10 +1,7 @@
 import { Logger } from "../config/logger";
 import { Code, HttpError, Status } from "../types/error";
 import { GoToApiService } from "../types/externalApi";
-import {
-  SubscriptionRequest,
-  SubscriptionResponse,
-} from "../types/subscription";
+import { SubscriptionRequest } from "../types/subscription";
 
 export default class SubscriptionApi implements GoToApiService {
   private subscription: SubscriptionRequest;
@@ -16,7 +13,7 @@ export default class SubscriptionApi implements GoToApiService {
 
   public async fetchData(token: string) {
     const response = await fetch(
-      `https://api.dev.goto.com/call-events/v1/subscriptions`,
+      `https://api.goto.com/call-events/v1/subscriptions`,
       this.subscription.request(token),
     );
     if (response.status != 207) {

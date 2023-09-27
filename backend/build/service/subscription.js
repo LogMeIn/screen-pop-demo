@@ -18,7 +18,7 @@ class SubscriptionApi {
     }
     fetchData(token) {
         return __awaiter(this, void 0, void 0, function* () {
-            const response = yield fetch(`https://api.dev.goto.com/call-events/v1/subscriptions`, this.subscription.request(token));
+            const response = yield fetch(`https://api.goto.com/call-events/v1/subscriptions`, this.subscription.request(token));
             if (response.status != 207) {
                 if (response.status == 401) {
                     this.logger.error(`Insufficient scope for subscription`);

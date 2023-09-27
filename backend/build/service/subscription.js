@@ -9,8 +9,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const http_errors_1 = require("http-errors");
 const logger_1 = require("../config/logger");
+const error_1 = require("../types/error");
 class SubscriptionApi {
     constructor(subscription) {
         this.logger = new logger_1.Logger("subscription-service");
@@ -21,11 +21,11 @@ class SubscriptionApi {
             const response = yield fetch(`https://api.dev.goto.com/call-events/v1/subscriptions`, this.subscription.request(token));
             if (response.status != 207) {
                 if (response.status == 401) {
-                    return Promise.reject(new http_errors_1.Unauthorized);
+                    this.logger.error(`Insufficient scope for subscription`);
+                    return new error_1.HttpError(error_1.Status.UNAUTHORIZED, error_1.Code.UNAUTHORIZED, `missing scopes in the token`);
                 }
-                // Put error handling here
-                this.logger.error(`failed to fetch subscription with token ${token} and error: ${response.statusText}`);
-                return Promise.reject(new http_errors_1.BadRequest(`Status is ${response.status} and error: ${response.statusText}`));
+                this.logger.error(`Bad request for subscription`);
+                return new error_1.HttpError(error_1.Status.BAD_REQUEST, error_1.Code.BAD_REQUEST, `Bad request`);
             }
             this.logger.info("Subscription has been created");
             return response.json();

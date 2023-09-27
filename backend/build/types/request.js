@@ -4,11 +4,11 @@ class Request {
     static init(token, data) {
         return {
             headers: {
-                "Authorization": `${token}`,
-                "Content-Type": "application/json"
+                Authorization: `${token}`,
+                "Content-Type": "application/json",
             },
             method: "POST",
-            body: JSON.stringify(data)
+            body: JSON.stringify(data),
         };
     }
 }

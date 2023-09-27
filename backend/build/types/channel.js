@@ -12,7 +12,7 @@ class ChannelRequest {
             channelData: {
                 channelType: "WebSockets",
                 isConnected: false,
-            }
+            },
         };
     }
     request(token) {

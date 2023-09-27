@@ -1,12 +1,10 @@
-import {
-  BadRequest, Unauthorized,
-} from "http-errors";
 import { Logger } from "../config/logger";
 import { ChannelRequest } from "../types/channel";
+import { Code, HttpError, Status } from "../types/error";
 import { GoToApiService } from "../types/externalApi";
 
 export default class NotificationChannelApi implements GoToApiService {
-  private channelNickname: string = "screen-pop-demo"
+  private channelNickname: string = "screen-pop-demo";
   private channel: ChannelRequest;
   private logger = new Logger("notification-channel-service");
 
@@ -15,15 +13,34 @@ export default class NotificationChannelApi implements GoToApiService {
   }
 
   public async fetchData(token: string) {
-    const response = await fetch(`https://api.dev.goto.com/notification-channel/v1/channels/${this.channelNickname}`, this.channel.request(token));
+    const response = await fetch(
+      `https://api.dev.goto.com/notification-channel/v1/channels/${this.channelNickname}`,
+      this.channel.request(token),
+    );
     if (response.status != 201) {
       if (response.status == 401) {
-        return Promise.reject(new Unauthorized);
+        this.logger.error(
+          `Insufficient scope for notification channel`,
+        );
+        return new HttpError(
+          Status.UNAUTHORIZED,
+          Code.UNAUTHORIZED,
+          `missing scopes in the token`,
+        );
       }
-      // Put error handling here
-      return Promise.reject(new BadRequest(`Status is ${response.status} and error: ${response.text}`));
+
+      if (response.status == 403) {
+        this.logger.error(`Token is missing for notification channel`);
+        return new HttpError(
+          Status.FORBIDDEN,
+          Code.FORBIDDEN,
+          `missing token in the token`,
+        );
+      }
+      this.logger.error(`Bad request for notification channel`);
+      return new HttpError(Status.BAD_REQUEST, Code.BAD_REQUEST, `Bad request`);
     }
-    this.logger.info("Channel has been created")
+    this.logger.info("Channel has been created");
     return response.json();
   }
 }

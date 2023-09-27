@@ -9,8 +9,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const http_errors_1 = require("http-errors");
 const logger_1 = require("../config/logger");
+const error_1 = require("../types/error");
 class NotificationChannelApi {
     constructor(channel) {
         this.channelNickname = "screen-pop-demo";
@@ -22,10 +22,15 @@ class NotificationChannelApi {
             const response = yield fetch(`https://api.dev.goto.com/notification-channel/v1/channels/${this.channelNickname}`, this.channel.request(token));
             if (response.status != 201) {
                 if (response.status == 401) {
-                    return Promise.reject(new http_errors_1.Unauthorized);
+                    this.logger.error(`Insufficient scope for notification channel with token ${token}`);
+                    return new error_1.HttpError(error_1.Status.UNAUTHORIZED, error_1.Code.UNAUTHORIZED, `missing scopes in the token`);
                 }
-                // Put error handling here
-                return Promise.reject(new http_errors_1.BadRequest(`Status is ${response.status} and error: ${response.text}`));
+                if (response.status == 403) {
+                    this.logger.error(`Token is missing for notification channel`);
+                    return new error_1.HttpError(error_1.Status.FORBIDDEN, error_1.Code.FORBIDDEN, `missing token in the token`);
+                }
+                this.logger.error(`Bad request for notification channel`);
+                return new error_1.HttpError(error_1.Status.BAD_REQUEST, error_1.Code.BAD_REQUEST, `Bad request`);
             }
             this.logger.info("Channel has been created");
             return response.json();

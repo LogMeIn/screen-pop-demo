@@ -13,6 +13,13 @@ class Util {
     static get port() {
         return Number(process.env.PORT) || 8000;
     }
+    static get corsOptions() {
+        return {
+            origin: "http://127.0.0.1:5000",
+            methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+            allowedHeaders: "Content-Type,Authorization", // Allow these headers
+        };
+    }
     static setupLogger(logger, req, res, next) {
         logger.info(`METHOD: [${req.method}] - URL: [${req.url}]`);
         res.on("finish", () => {

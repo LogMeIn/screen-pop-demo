@@ -12,37 +12,43 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const http_errors_1 = require("http-errors");
 const logger_1 = require("../config/logger");
 const subscription_1 = __importDefault(require("../service/subscription"));
+const error_1 = require("../types/error");
 const subscription_2 = require("../types/subscription");
 class ScreenPopRessources {
     constructor(notificationApi) {
         this.logger = new logger_1.Logger("screen-pop-ressources");
         this.ringingPopup = (req, res, next) => __awaiter(this, void 0, void 0, function* () {
             const token = this.token(req);
-            if (token === undefined) {
-                return Promise.reject(new http_errors_1.BadRequest("Token is missing"));
-            }
             return Promise.resolve(yield this.notificationApi.fetchData(token))
                 .then((channel) => __awaiter(this, void 0, void 0, function* () {
+                if (channel instanceof error_1.HttpError) {
+                    throw channel;
+                }
                 this.channel = channel;
                 const subscriptionApi = this.subscription;
-                return Promise.resolve(yield subscriptionApi.fetchData(token)).
-                    then((subscription) => {
-                    res.status(207).json(subscription);
+                return Promise.resolve(yield subscriptionApi.fetchData(token))
+                    .then(() => {
+                    this.response = { websocketUrl: channel.channelData.channelURL };
+                    res.status(201).json(this.response);
+                })
+                    .catch((error) => {
+                    res.status(error.code).json({
+                        message: error.message,
+                    });
                 });
             }))
                 .catch((error) => {
-                res.status(error.statusCode ? error.statusCode : 400).json({
-                    message: res.statusMessage
+                res.status(error.code).json({
+                    message: error.message,
                 });
             });
         });
         this.notificationApi = notificationApi;
     }
     token(req) {
-        return req.headers.authorization ? req.headers.authorization : undefined;
+        return req.headers.authorization ? req.headers.authorization : "";
     }
     get subscription() {
         var _a;

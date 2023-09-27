@@ -9,8 +9,8 @@ export default class NotificationResssources {
   constructor(gotoApiService: GoToApiService) {
     this.gotoApiService = gotoApiService;
   }
-  
+
   init = () => {
-      this.app.post("/notification", this.gotoApiService.fetchData);
-  }
+    this.app.post("/notification", this.gotoApiService.fetchData);
+  };
 }

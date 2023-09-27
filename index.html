@@ -40,11 +40,11 @@
           ready: false,
           token: "",
           subscription: "",
-          channel: "",
+          wsURL: "",
           events: [],
           oauth: new OAuth({
-            // Add Client Info
-            clientId: "49753f30-9a0a-4c0e-bc7a-053c2c07b2fd",
+            // Add Client Info 
+            clientId: "2dffecf8-70c2-4a08-8139-9fe5624917be",
           })
         }
       },
@@ -59,8 +59,7 @@
           })
         },
         callApis: async function () {
-          this.channel = await this.createChannel()
-          this.subscription = await this.subscribe()
+          this.wsURL = await this.createWs();
           await this.listen()
           this.ready = true;
         },
@@ -73,51 +72,21 @@
           }
         },
 
-        createChannel: async function () {
-          const data = JSON.stringify({
-            channelType: "WebSockets",
-            channelData: {
-              channelType: "WebSockets",
-              isConnected: false,
-            }
-          })
-          const response = await fetch("https://api.dev.goto.com/notification-channel/v1/channels/screen-pop-demo", {
+        createWs: async function () {
+          const response = await fetch("http://localhost:8000/screen-pop", {
             headers: {
               "Authorization": `Bearer ${this.token}`,
-              "Content-Type": "application/json"
+              "content-type": "application/json"
             },
             method: "POST",
-            body: data
-          })
-          return response.json();
-        },
-
-        subscribe: async function () {
-          // Create Subscription -> https://developer.goto.com/GoToConnect/#operation/createCallEventsSubscriptions
-
-          const data = JSON.stringify({
-            "channelId": this.channel.channelId,
-            "accountKeys": [
-              { "id": "4395980921202798602" }
-            ]
-          })
-
-          // test request : curl -X POST 'https://api.goto.com/call-events/v1/subscriptions' -H 'Authorization: Bearer {ACCESS_TOKEN}' -H 'Content-Type: application/json' \ -d '{"channelId": "a9d70239-a8c4-4b13-8ccf-9c60fb3ad388", "accountKeys": [{"id": "4395980921202798602"}]}'
-
-          const response = await fetch("https://api.goto.com/call-events/v1/subscriptions", {
-            headers: {
-              "Authorization": `Bearer ${this.token}`,
-              "Content-Type": "application/json"
-            },
-            method: "POST",
-            body: data
           })
           return response.json();
         },
 
         listen: async function () {
           // Listen for events
-          this.socket = new WebSocket(this.channel.channelData.channelURL)
+          const { websocketUrl } = this.wsURL;
+          this.socket = new WebSocket(websocketUrl)
           this.socket.onmessage = (event) => {
             const data = JSON.parse(event.data)
             const caller = data.data.content.state.participants[0]

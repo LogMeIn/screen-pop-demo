@@ -9,7 +9,7 @@ class ScreenPopEndpoint {
     constructor(gotoApiService) {
         this.app = express_1.default.Router();
         this.init = () => {
-            this.app.post("/screen-pop/ringings", this.screenPop.ringingPopup);
+            this.app.post("/screen-pop", this.screenPop.ringingPopup);
         };
         this.screenPop = new screenPop_1.default(gotoApiService);
         this.init();

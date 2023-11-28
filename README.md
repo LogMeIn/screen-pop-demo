@@ -14,7 +14,7 @@ For this tutorial you will need:
 
 Your OAuth client will be used to create tokens, which provide authorization to your API calls.
 
-To create your first client, 
+To create your first client,
 1. Navigate to the [OAuth Client Management Portal](https://developer.logmeininc.com/clients). You might have to log in again. If you do, use the user account that you created for the trial setup. Note that the user account used to create OAuth clients is the only user account which can manage the clients. This tutorial will use the [Authorization Code Grant flow](https://developer.goto.com/Authentication/#section/Authorization-Flows/Authorization-Code-Grant) for authorization. Interactions with this flow have been created for you in the template used further down.
 
 2. Click 'Create a client' to begin filling out your client information. Name your client something meaningful. For this tutorial we named our client "screen-pop-demo" to match the application we are creating it for. The redirect URI must equal `http://localhost:5000/app/redirect` for this tutorial.

@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <link
+      href="https://unpkg.com/vuetify@3.4.1/dist/vuetify.min.css"
+      rel="stylesheet"
+    />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui"
+      charset="UTF-8"
+    />
+    <title>Screen Pop Demo</title>
+    <style>
+      .card {
+        border-style: solid;
+        border-color: #494f57;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="app">
+      <v-app>
+        <v-main>
+          <v-container>
+            <v-row justify="space-around">
+              <v-card width="400">
+                <v-card-title>Screen Pop Demo</v-card-title>
+
+                <v-card-text>
+                  <div class="font-weight-bold ms-1 mb-2">Events</div>
+                  <v-timeline density="compact" align="start">
+                    <v-timeline-item
+                      v-for="event in screenPopEvents"
+                      :key="event.id"
+                      size="x-small"
+                      dot-color="grey"
+                      class="mb-4"
+                    >
+                      <div class="mb-4">
+                        <div class="font-weight-normal">
+                          <strong>{{ event.name }}</strong>
+                        </div>
+                        <div>
+                          Phone: {{ event.number }}<br />
+                          Time: {{ event.timestamp }}<br />
+                          Last Call: {{ event.lastCall }}<br />
+                          Notes: {{ event.notes }}<br />
+                        </div>
+                      </div>
+                    </v-timeline-item>
+                  </v-timeline>
+                </v-card-text>
+              </v-card>
+            </v-row>
+          </v-container>
+        </v-main>
+      </v-app>
+    </div>
+
+    <script src="https://unpkg.com/vue@3.3.8/dist/vue.global.js"></script>
+    <script src="https://unpkg.com/vuetify@3.4.1/dist/vuetify.min.js"></script>
+    <script>
+      Vue.createApp({
+        data() {
+          return {
+            ready: false,
+            screenPopEvents: [],
+          };
+        },
+        mounted: function () {
+          this.start(); //method will execute at pageload
+        },
+        methods: {
+          start: async function () {
+            await this.listen();
+          },
+          listen: function () {
+            this.socket = new WebSocket("ws://localhost:3000");
+            this.ready = true;
+            this.socket.addEventListener("open", (event) => {
+              console.log("WebSocket connection established.");
+            });
+
+            this.socket.onmessage = (event) => {
+              const data = JSON.parse(event.data);
+              data.timestamp = new Date(data.timestamp).toLocaleString();
+              console.log(data);
+              this.screenPopEvents.unshift(data);
+            };
+
+            this.socket.addEventListener("close", (event) => {
+              console.log("Connection closed");
+            });
+
+            this.socket.addEventListener("error", (error) => {
+              console.error(`WebSocket Error: [${error.message}]`);
+            });
+          },
+        },
+      })
+        .use(Vuetify.createVuetify())
+        .mount("#app");
+    </script>
+  </body>
+</html>
